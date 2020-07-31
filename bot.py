@@ -5,7 +5,7 @@ from discord.ext import commands
 client = discord.Client()
 bot = commands.Bot(command_prefix='!poke ')
 
-# Bot ommands
+# Bot Commands
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong!')
@@ -26,4 +26,4 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-bot.run('NzM4MTk4NzkwNjk5MzUyMTE1.XyIbMg.TCublKX6CjNp3U2R9PZUZobY8ow')
+bot.run('Insert Token Here')
