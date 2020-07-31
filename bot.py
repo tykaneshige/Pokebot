@@ -34,5 +34,5 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-bot.run('NzM4MTk4NzkwNjk5MzUyMTE1.XyIbMg.VO_yepVM3qJqBgmR4NnOzaPktko')
+bot.run('Insert Token Here')
 
