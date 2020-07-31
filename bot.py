@@ -1,6 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands
+import random
 
 client = discord.Client()
 bot = commands.Bot(command_prefix='!poke ')
@@ -15,6 +16,13 @@ async def exit(ctx):
     await ctx.send('Shutting down.')
     await bot.close()
 
+@bot.command()
+async def quote(ctx):
+    responses = open('quotes.txt').read().splitlines()
+    random.seed(a=None)
+    response = random.choice(responses)
+    await ctx.send(response)
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -26,4 +34,5 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-bot.run('Insert Token Here')
+bot.run('NzM4MTk4NzkwNjk5MzUyMTE1.XyIbMg.JKjt1j5lBMNbLtCd7IfoMPWPv3Q')
+
