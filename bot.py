@@ -19,6 +19,11 @@ async def quote(ctx):
     await ctx.send(response)
 
 @bot.command()
+async def gimme(ctx):
+    quote = open('gimme.txt').read()
+    await ctx.send(quote)
+
+@bot.command()
 async def goat(ctx):
     with open('images/Joe_Kelly.png', 'rb') as fp:
         goat = discord.File(fp)
