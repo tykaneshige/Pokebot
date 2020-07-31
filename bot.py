@@ -21,4 +21,8 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
+<<<<<<< HEAD
 bot.run('Insert Token Here')
+=======
+client.run('Insert Token Here')
+>>>>>>> 09ac4a3f09bc972cc94ac56aab72a04fea315170
