@@ -1,15 +1,38 @@
 import asyncio
 import discord
-from discord.ext import commands
 import random
+import youtube_dl
+
+from discord.ext import commands
 
 client = discord.Client()
 bot = commands.Bot(command_prefix='!')
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 # Bot Commands
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong!')
+
+@bot.command()
+async def gimme(ctx):
+    quote = open('gimme.txt').read()
+    await ctx.send(quote)
 
 @bot.command()
 async def quote(ctx):
@@ -19,15 +42,28 @@ async def quote(ctx):
     await ctx.send(response)
 
 @bot.command()
-async def gimme(ctx):
-    quote = open('gimme.txt').read()
-    await ctx.send(quote)
-
-@bot.command()
 async def goat(ctx):
     with open('images/Joe_Kelly.png', 'rb') as fp:
-        goat = discord.File(fp)
+        goat = discord.File(fp, spoiler=True)
         await ctx.send(file=goat)
+
+@bot.command()
+async def whoami(ctx):
+    with open('images/Me.png', 'rb') as fp:
+        me = discord.File(fp)
+        await ctx.send(file=me)
+
+@bot.command()
+async def nyet(ctx):
+
+    url = 'https://www.youtube.com/watch?v=stlZEKoJg10'
+
+    channel = ctx.author.voice.channel
+    vc = await channel.connect()
+
+@bot.command()
+async def dc(ctx):
+    await ctx.voice_client.disconnect()
 
 @bot.command()
 async def exit(ctx):
@@ -39,6 +75,7 @@ async def exit(ctx):
     else:
         print('Bot did not properly shut down.')
 
+# Bot Events
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -50,5 +87,5 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-bot.run('Insert Token Here')
+bot.run('NzM4MTk4NzkwNjk5MzUyMTE1.XyIbMg.r_bsdoBDQn3nqCxT6WcFq89bRsw')
 
