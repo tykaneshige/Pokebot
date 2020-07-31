@@ -23,6 +23,11 @@ async def quote(ctx):
     response = random.choice(responses)
     await ctx.send(response)
 
+@bot.command()
+async def gimme(ctx):
+    quote = open('gimme.txt').read()
+    await ctx.send(quote)
+
 @bot.event
 async def on_ready():
     print('Logged in as')
