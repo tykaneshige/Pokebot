@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 client = discord.Client()
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!poke ')
 
 # Bot ommands
 @bot.command
@@ -21,8 +21,4 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-<<<<<<< HEAD
 bot.run('Insert Token Here')
-=======
-client.run('Insert Token Here')
->>>>>>> 09ac4a3f09bc972cc94ac56aab72a04fea315170
