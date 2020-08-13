@@ -5,7 +5,7 @@ from discord.ext import commands
 
 client = discord.Client()
 bot = commands.Bot(command_prefix='!poke ')
-Token = 'NzQzNTcwNDQ2OTg0ODA2NDcw.XzWl8Q.gEWDg-RI8UPdGNpLbfcvfjTEJ_8'
+Token = 'Insert Token Here'
 
 
 
