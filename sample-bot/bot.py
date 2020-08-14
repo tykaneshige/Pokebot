@@ -5,24 +5,10 @@ import youtube_dl
 
 from discord.ext import commands
 
+token = 'Insert Token Here'
+
 client = discord.Client()
 bot = commands.Bot(command_prefix='!')
-
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
-}
-
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 # Bot Commands
 @bot.command()
@@ -54,14 +40,6 @@ async def whoami(ctx):
         await ctx.send(file=me)
 
 @bot.command()
-async def nyet(ctx):
-
-    url = 'https://www.youtube.com/watch?v=stlZEKoJg10'
-
-    channel = ctx.author.voice.channel
-    vc = await channel.connect()
-
-@bot.command()
 async def dc(ctx):
     await ctx.voice_client.disconnect()
 
@@ -87,5 +65,4 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-bot.run('Insert Token Here')
-
+bot.run(token)
