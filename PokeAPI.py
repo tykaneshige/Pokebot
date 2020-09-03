@@ -109,7 +109,7 @@ class PokeInfo:
 	# Retrieves Pokemon Moves
 	# TODO: Figure an algorithm to produce a set of four moves based on level
 	def get_moves(self):
-		pass
+		return "Not yet implemented"
 
 		'''
 		moves = self.json['moves']

@@ -6,3 +6,16 @@
 *Nicholas Yamamoto* </br>
 
 ---
+
+## TODO LIST
+* Pokebot.py
+  * Implement pokemon spawning system
+  * Implement catching mechanism.
+  * Implement pokemon storage mechanics.
+
+* Trainer.py
+  * Implement basic functionalities.
+  * Implement pokemon sorting algorithm.
+
+* PokeAPI.py
+  * Implement moveset retrieval.

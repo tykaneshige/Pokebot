@@ -1,8 +1,7 @@
 class Trainer:
 
-    def __init__(self, id, name):
+    def __init__(self,name):
 
-        self.id = id
         self.name = name
 
         self.team = []
@@ -10,11 +9,6 @@ class Trainer:
         self.pokemon_order = []
 
         self.items = {}
-
-    # Trainer-related functions
-
-    def change_name(self, name):
-        pass
 
     # Pokemon-related functions
 
@@ -32,5 +26,4 @@ class Trainer:
     # 1: Sort by number
     # 2: Sort by name (alphabetical)
     def sort_pokemon(self, method):
-
-        
+        pass

@@ -1,3 +1,5 @@
+from Trainer import *
+
 import asyncio
 import discord
 import random
@@ -9,6 +11,15 @@ Token = 'Insert Token Here'
 LOW_BOUND = 1
 HIGH_BOUND = 151
 
+start_text = """ 
+Hello there! Welcome to the world of Pokémon!
+My name is Oak! People call me the Pokémon Prof!
+This world is inhabited by creatures called Pokémon!
+For some people, Pokémon are pets. Others use them for fights...
+Your very own Pokémon adventure is about to unfold!
+A world of dreams and adventures with Pokémon awaits! Let\'s go!
+"""
+
 client = discord.Client()
 bot = commands.Bot(command_prefix='!poke ')
 
@@ -18,6 +29,7 @@ class Pokebot(commands.Cog):
         self.bot = bot
 
         self.trainers = {}
+        self.pokemon = []
 
         self.counter = 0
     
@@ -28,29 +40,77 @@ class Pokebot(commands.Cog):
     async def ping(self,ctx):
         await ctx.send('pong!')
 
+    # Start Command
     @commands.command()
-    async def yeet(self,ctx):
-        await ctx.send('yote!')
+    async def start(self,ctx,name=''):
 
-    @commands.command()
-    async def start(self,ctx):
+        # Check for a trainer name
+        if name == '':
+            await ctx.send('Please pass a name. (Format: \' !poke start <trainer_name>\'')
+            return
+
+        # Check if the trainer exists 
         if ctx.author.id not in self.trainers:
-            await ctx.send('Welcome to World of Pokemon! Please Enter your name in the format: "Hello, my name is ________')
-            self.trainers[ctx.author.id] = "New Trainer"
+
+            # Add discord ID to trainer list
+            self.trainers[ctx.author.id] = Trainer(name)
+
+            # Append a line to the opening text
+            opening_text = start_text + 'Welcome to the world of Pokemon, {}!'.format(name)
+
+            # Opening prompt from Professor Oak
+            await ctx.send(opening_text)
+
         else:
             await ctx.send("You are already a Trainer!")
+            return
 
+    # Returns a list of all trainers in the server
+    @commands.command()
+    async def trainers(self,ctx):
+
+        # Compile a trainer list
+        trainer_list = ''
+        for trainer in self.trainers.values():
+            trainer_list += str(trainer.name)
+
+        # Send the trainer list to the server
+        await ctx.send(trainer_list)
+
+    # Rename the trainer owned by the user who made the request
+    @commands.command()
+    async def rename(self,ctx,name=''):
+        
+        # Check for a trainer name
+        if name == '':
+            await ctx.send('Please enter pass a name.')
+            return
+        
+        try:
+
+            # Verify if trainer name is already in use
+            for trainer in self.trainers.values():
+                if trainer.name == name:
+                    await ctx.send('\'{}\' is already taken.'.format(name))
+                    return
+            
+            # Change trainer name
+            self.trainers[ctx.author.id].name = name
+
+            await ctx.send('Successfully changed trainer name.')
+
+        except:
+            await ctx.send('Error renaming trainer.')
+
+    # TODO: Remove before final version
     @commands.command()
     async def count(self,ctx):
         await ctx.send(self.counter)
 
-    @commands.command()
-    async def trainer(self,ctx):
-        await ctx.send(self.trainers)
-
+    # TODO: Remove before final version
     @commands.command()
     async def exit(self,ctx):
-        await ctx.send('Aight Imma head out.')
+        await ctx.send('Shutting Down.')
         await self.bot.close()
 
         if self.bot.is_closed():
@@ -58,16 +118,14 @@ class Pokebot(commands.Cog):
         else:
             print('Bot did not terminate properly.')
 
-    #Bot Listeners
+    # Bot Listeners
 
-    """
     @commands.Cog.listener()
-    async def on_message(self,message):
-        if message.author.id is not self.bot.user.id and message.content.startswith ("Hello, my name is"):
-            splitMessage=message.content
-            x=splitMessage.split()
-            await message.channel.send(x[4])
-    """
+    async def on_ready(self):
+        print('Logged in as')
+        print(self.bot.user.name)
+        print(self.bot.user.id)
+        print('------')
 
     @commands.Cog.listener()
     async def on_message(self,message):
