@@ -60,7 +60,8 @@ class Pokebot(commands.Cog):
 
     #Bot Listeners
 
-    """@commands.Cog.listener()
+    """
+    @commands.Cog.listener()
     async def on_message(self,message):
         if message.author.id is not self.bot.user.id and message.content.startswith ("Hello, my name is"):
             splitMessage=message.content
