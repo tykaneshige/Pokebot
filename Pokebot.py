@@ -12,6 +12,7 @@ from discord.ext import commands
 Token = 'Insert Token Here'
 
 SPAWN_COUNTER = 1
+SPAWN_LIMIT = 1
 
 LOW_BOUND = 1
 HIGH_BOUND = 151
@@ -34,7 +35,7 @@ class Pokebot(commands.Cog):
         self.bot = bot
 
         self.trainers = {}
-        self.pokemon = []
+        self.pokemon = {}
 
         self.counter = 0
     
@@ -107,15 +108,29 @@ class Pokebot(commands.Cog):
         except:
             await ctx.send('Error renaming trainer.')
 
-    # TODO: Remove before final version
+    # TODO
     @commands.command()
-    async def test(self,ctx):
+    async def catch(self,ctx,name=''):
+        
+        # Check for a Pokemon name
+        if name == '':
+            await ctx.send('Please enter a name of Pokemon.')
+            return
+
         pass
+
+    # Returns a list of Pokemon images available for capture
+    @commands.command()
+    async def available(self):
+        for key in self.pokemon.keys():
+            send_file = self.generate_file(key)
+            with open(send_file, 'rb') as fp:
+                await ctx.send('Who\'s that Pokemon?', file=send_file)
 
     # TODO: Remove before final version
     @commands.command()
-    async def count(self,ctx):
-        await ctx.send(self.counter)
+    async def test(self,ctx,name):
+        pass
 
     # TODO: Remove before final version
     @commands.command()
@@ -164,12 +179,27 @@ class Pokebot(commands.Cog):
                         continue
                     else:
                         break
+
+                # Check to see if the spawn limit has been reached
+                if self.pokemon.len() == SPAWN_LIMIT:
+
+                    # Despawn the oldest Pokemon
+                    oldest_key = 0
+                    oldest_time = 0
+                    for key,poke in self.pokemon:
+                        if poke.creation_time < oldest_time or oldest_time == 0:
+                            oldest_key = key
+
+                    del self.pokemon[str(oldest_key)]
                 
                 # Spawn Pokemon in Discord
                 try:
 
                    # Generate Pokemon data
                     new_pokemon = PokeInfo(str(randNum))
+
+                    # Add Pokemon to dictionary
+                    self.pokemon[randNum] = new_pokemon
 
                     # Pull the sprite from the internet
                     sprite = requests.get(str(new_pokemon.sprite))
@@ -191,7 +221,6 @@ class Pokebot(commands.Cog):
     # Auxiliary Functions
     def generate_filename(self,num):
         return 'image_cache/img' + str(num) + '.png'
-
 
 if __name__ == '__main__' :
     bot.add_cog(Pokebot(bot))

@@ -1,6 +1,7 @@
 # Uses the PokeAPI to return stats of the pokemon queried.
 import json
 import random
+import time
 
 from urllib.request import *
 
@@ -13,7 +14,7 @@ class PokeInfo:
 
 		# Metadata
 		self.num = num
-		self.creation_time = 0
+		self.creation_time = time.time()
 		self.json = self.make_request(num)
 
 		# Pokemon Data
