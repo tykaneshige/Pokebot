@@ -1,12 +1,17 @@
 from Trainer import *
+from PokeAPI import *
 
 import asyncio
 import discord
+import os
 import random
+import requests
 
 from discord.ext import commands
 
 Token = 'Insert Token Here'
+
+SPAWN_COUNTER = 1
 
 LOW_BOUND = 1
 HIGH_BOUND = 151
@@ -104,6 +109,11 @@ class Pokebot(commands.Cog):
 
     # TODO: Remove before final version
     @commands.command()
+    async def test(self,ctx):
+        pass
+
+    # TODO: Remove before final version
+    @commands.command()
     async def count(self,ctx):
         await ctx.send(self.counter)
 
@@ -129,13 +139,59 @@ class Pokebot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self,message):
+        
+        # Increment counter for every non-command message
         if message.author.id is not self.bot.user.id and not message.content.startswith("!poke "):
             self.counter+=1
         
-            if self.counter == 5:
+            # Check if a Pokemon should be spawned
+            if self.counter == SPAWN_COUNTER:
+                
+                # Reset counter to 0
                 self.counter = 0
-                randNum = random.randint(LOW_BOUND,HIGH_BOUND)
-                await message.channel.send("A wild Pokemon #" + str(randNum) +" has appeared!")
+
+                # Repeatedly generate Pokemon until a unique Pokemon is found
+                while 1:
+
+                    # Generate a random number
+                    randNum = random.randint(LOW_BOUND,HIGH_BOUND)
+
+                    # Generate new filename
+                    new_filename = self.generate_filename(randNum)
+
+                    # Check if the file exists already in cache
+                    if new_filename in os.listdir('image_cache/'):
+                        continue
+                    else:
+                        break
+                
+                # Spawn Pokemon in Discord
+                try:
+
+                   # Generate Pokemon data
+                    new_pokemon = PokeInfo(str(randNum))
+
+                    # Pull the sprite from the internet
+                    sprite = requests.get(str(new_pokemon.sprite))
+
+                    # Save image to a file
+                    with open(new_filename, 'wb') as fd:
+                        fd.write(sprite.content)
+                        fd.close()
+
+                    # Send image to Discord
+                    with open(new_filename, 'rb') as fp:
+                        img = discord.File(fp)
+                        await ctx.send('Who\'s that Pokemon?', file=img)
+
+                except:
+                    await ctx.send('Error retrieving pokemon data.')
+                    return
+
+    # Auxiliary Functions
+    def generate_filename(self,num):
+        return 'image_cache/img' + str(num) + '.png'
+
 
 if __name__ == '__main__' :
     bot.add_cog(Pokebot(bot))

@@ -9,7 +9,6 @@
 
 ## TODO LIST
 * Pokebot.py
-  * Implement pokemon spawning system
   * Implement catching mechanism.
   * Implement pokemon storage mechanics.
 

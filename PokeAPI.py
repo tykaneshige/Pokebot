@@ -11,9 +11,12 @@ class PokeInfo:
 
 	def __init__(self, num):
 
+		# Metadata
+		self.num = num
+		self.creation_time = 0
 		self.json = self.make_request(num)
 
-		self.num = num
+		# Pokemon Data
 		self.name = self.json['name']
 		self.level = random.randint(1,100)
 		self.type = self.get_types()
@@ -204,6 +207,8 @@ class PokeInfo:
 			print(str(key) + ':')
 			print('   Base Stat: ' + str(self.stats[key]['base']))
 			print('   Real: ' + str(self.stats[key]['stat']))
+
+		print('Sprite: ' + str(self.sprite))
 
 if __name__ == '__main__':
 	thing = input('Pokemon Name: ')
