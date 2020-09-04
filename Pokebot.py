@@ -12,7 +12,7 @@ from discord.ext import commands
 Token = 'Insert Token Here'
 
 SPAWN_COUNTER = 1
-SPAWN_LIMIT = 1
+SPAWN_LIMIT = 3
 
 LOW_BOUND = 1
 HIGH_BOUND = 151
@@ -121,10 +121,11 @@ class Pokebot(commands.Cog):
 
     # Returns a list of Pokemon images available for capture
     @commands.command()
-    async def available(self):
+    async def available(self,ctx):
         for key in self.pokemon.keys():
-            send_file = self.generate_file(key)
-            with open(send_file, 'rb') as fp:
+            img_file = self.generate_filename(key)
+            with open(img_file, 'rb') as fp:
+                send_file = discord.File(fp)
                 await ctx.send('Who\'s that Pokemon?', file=send_file)
 
     # TODO: Remove before final version
@@ -143,6 +144,9 @@ class Pokebot(commands.Cog):
         else:
             print('Bot did not terminate properly.')
 
+        # Clear image cache
+        self.clear_cache()
+
     # Bot Listeners
 
     @commands.Cog.listener()
@@ -151,6 +155,9 @@ class Pokebot(commands.Cog):
         print(self.bot.user.name)
         print(self.bot.user.id)
         print('------')
+
+        # Clear image cache
+        self.clear_cache()
 
     @commands.Cog.listener()
     async def on_message(self,message):
@@ -171,27 +178,33 @@ class Pokebot(commands.Cog):
                     # Generate a random number
                     randNum = random.randint(LOW_BOUND,HIGH_BOUND)
 
-                    # Generate new filename
-                    new_filename = self.generate_filename(randNum)
-
                     # Check if the file exists already in cache
-                    if new_filename in os.listdir('image_cache/'):
+                    if str(randNum) + '.png' in os.listdir('image_cache/'):
                         continue
                     else:
                         break
 
                 # Check to see if the spawn limit has been reached
-                if self.pokemon.len() == SPAWN_LIMIT:
+                if len(self.pokemon) == SPAWN_LIMIT:
 
-                    # Despawn the oldest Pokemon
+                    # Search for the oldest Pokemon
                     oldest_key = 0
                     oldest_time = 0
-                    for key,poke in self.pokemon:
+                    for key,poke in self.pokemon.items():
                         if poke.creation_time < oldest_time or oldest_time == 0:
                             oldest_key = key
 
+                    # Despawn the oldest pokemon
                     del self.pokemon[str(oldest_key)]
-                
+
+                    # Remove image file from cache
+                    try:
+                        old_filename = self.generate_filename(oldest_key)
+                        os.remove(old_filename)
+                    except:
+                        await message.channel.send('Error despawning old Pokemon.')
+                        return
+
                 # Spawn Pokemon in Discord
                 try:
 
@@ -199,10 +212,13 @@ class Pokebot(commands.Cog):
                     new_pokemon = PokeInfo(str(randNum))
 
                     # Add Pokemon to dictionary
-                    self.pokemon[randNum] = new_pokemon
+                    self.pokemon[str(randNum)] = new_pokemon
 
                     # Pull the sprite from the internet
                     sprite = requests.get(str(new_pokemon.sprite))
+
+                    # Generate new filename
+                    new_filename = self.generate_filename(randNum)
 
                     # Save image to a file
                     with open(new_filename, 'wb') as fd:
@@ -212,15 +228,22 @@ class Pokebot(commands.Cog):
                     # Send image to Discord
                     with open(new_filename, 'rb') as fp:
                         img = discord.File(fp)
-                        await ctx.send('Who\'s that Pokemon?', file=img)
+                        await message.channel.send('Who\'s that Pokemon?', file=img)
 
                 except:
-                    await ctx.send('Error retrieving pokemon data.')
+                    await message.channel.send('Error retrieving pokemon data.')
                     return
 
     # Auxiliary Functions
+
+    # Generates a filepath for a given Pokemon numebr
     def generate_filename(self,num):
         return 'image_cache/img' + str(num) + '.png'
+
+    # Clears image_cache (used upon startup and shutdown)
+    def clear_cache(self):
+        for file in os.listdir('image_cache/'):
+            os.remove('image_cache/' + str(file))
 
 if __name__ == '__main__' :
     bot.add_cog(Pokebot(bot))
