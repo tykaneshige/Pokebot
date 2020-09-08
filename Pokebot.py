@@ -117,7 +117,30 @@ class Pokebot(commands.Cog):
             await ctx.send('Please enter a name of Pokemon.')
             return
 
-        pass
+        # Search for a match within the list of spawned Pokemon
+        caught_key = ''
+        for key,pokemon in self.pokemon.items():
+            if name.lower() == pokemon.name:
+                caught_key = key
+                break
+
+        # Return to main loop if no match is made
+        if not caught_key:
+            await ctx.send('Try again!')
+            return
+        
+        # Remove Pokemon sprite from image cache
+        try:
+            r_file = self.generate_filename(caught_key)
+            os.remove(r_file)
+        except:
+            await ctx.send('Error catching Pokemon.')
+            return
+
+        await ctx.send('Congratulations! You caught a {}!'.format(self.pokemon[caught_key].name.capitalize()))
+    
+        # Remove Pokemon from memory
+        del self.pokemon[caught_key]
 
     # Returns a list of Pokemon images available for capture
     @commands.command()
@@ -130,7 +153,7 @@ class Pokebot(commands.Cog):
 
     # TODO: Remove before final version
     @commands.command()
-    async def test(self,ctx,name):
+    async def test(self,ctx):
         pass
 
     # TODO: Remove before final version
@@ -151,10 +174,12 @@ class Pokebot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Logged in as')
-        print(self.bot.user.name)
-        print(self.bot.user.id)
+        print('Logged in as {}'.format(self.bot.user.name))
+        print('ID: {}'.format(self.bot.user.id))
         print('------')
+
+        # Create image cache if needed
+        self.create_cache()
 
         # Clear image cache
         self.clear_cache()
@@ -240,10 +265,25 @@ class Pokebot(commands.Cog):
     def generate_filename(self,num):
         return 'image_cache/img' + str(num) + '.png'
 
+    # Creates an image cache if none exists
+    def create_cache(self):
+        print('Checking for image cache...')
+        if 'image_cache' not in os.listdir():
+            print('Image cache not found. Creating image cache...')
+            os.mkdir('image_cache')
+            print('Image cache created.')
+        else:
+            print('Image cache found.')
+
     # Clears image_cache (used upon startup and shutdown)
     def clear_cache(self):
-        for file in os.listdir('image_cache/'):
-            os.remove('image_cache/' + str(file))
+        print('Clearing image cache...')
+        try:
+            for file in os.listdir('image_cache/'):
+                os.remove('image_cache/' + str(file))
+            print('Image cache cleared.')
+        except:
+            print('Error clearing image cache.')
 
 if __name__ == '__main__' :
     bot.add_cog(Pokebot(bot))
