@@ -1,21 +1,24 @@
-from pokeAPI import *
+from PokeAPI import *
 
 class Pokemon:
 
-    def __init__(self, num):
+    # <poke_obj> is a PokeAPI object
+    def __init__(self,poke_obj):
 
-        self.num = num
-        self.name = 0
+        self.num = poke_obj.num
+        self.name = poke_obj.name
 
-        self.level = 0
-        self.type = 0
-        self.item = 0
-        self.ability = 0
-        self.moves = {}
+        self.level = poke_obj.level
+        self.type = poke_obj.type
+        self.item = poke_obj.item
+        self.ability = poke_obj.ability
+        self.moves = poke_obj.moves
+        self.stats = poke_obj.stats
 
         self.evolve = (0,0)
+        self.all_moves = poke_obj.all_moves
 
-        self.nickname = 0
+        self.nickname = ''
 
     # Increases level by 1
     # Checks for new moves

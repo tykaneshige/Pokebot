@@ -10,7 +10,7 @@ url = 'https://pokeapi.co/api/v2/pokemon/'
 
 class PokeInfo:
 
-	def __init__(self, num):
+	def __init__(self,num):
 
 		# Metadata
 		self.num = num
@@ -21,16 +21,15 @@ class PokeInfo:
 		self.name = self.json['name']
 		self.level = random.randint(1,100)
 		self.type = self.get_types()
+		self.item = ''
 		self.ability = self.get_abilities()
-		self.moves = self.get_moves()
 		self.stats = self.get_stats()
+		self.moves = self.get_moves()
 
 		self.sprite = self.json['sprites']['front_default']
 
-		'''
-		self.evolve_lv = 0
-		self.evolve_to = 0
-		'''
+		self.evolve = (0,0)
+		self.all_moves = 0
 
 	# Sends the get request to the API
 	def make_request(self, num):
@@ -110,39 +109,6 @@ class PokeInfo:
 			else:
 				return ability_list[0]
 
-	# Retrieves Pokemon Moves
-	# TODO: Figure an algorithm to produce a set of four moves based on level
-	def get_moves(self):
-		return "Not yet implemented"
-
-		'''
-		moves = self.json['moves']
-		moves1 = moves[0]
-		moves01 = moves1['move']
-		move1 = moves01['name']
-		print('Move 1: ' + move1)
-
-		indices = len(moves)
-
-		if indices > 1:
-		    moves2 = moves[1]
-		    moves02 = moves2['move']
-		    move2 = moves02['name']
-		    print('Move 2: ' + move2)
-
-		if indices > 2:
-		    moves3 = moves[2]
-		    moves03 = moves3['move']
-		    move3 = moves03['name']
-		    print('Move 3: ' + move3)
-
-		if indices > 3:
-		    moves4 = moves[3]
-		    moves04 = moves4['move']
-		    move4 = moves04['name']
-		    print('Move 4: ' + move4)
-		'''
-
 	# Retrieves Pokemon stats
 	def get_stats(self):
 
@@ -193,6 +159,47 @@ class PokeInfo:
 		# Returns all Pokemon stats
 		return all_stats
 
+	# Retrieves Pokemon Moves
+	# TODO: Figure an algorithm to produce a set of four moves based on level
+	def get_moves(self):
+		return "Not yet implemented"
+
+		'''
+		moves = self.json['moves']
+		moves1 = moves[0]
+		moves01 = moves1['move']
+		move1 = moves01['name']
+		print('Move 1: ' + move1)
+
+		indices = len(moves)
+
+		if indices > 1:
+		    moves2 = moves[1]
+		    moves02 = moves2['move']
+		    move2 = moves02['name']
+		    print('Move 2: ' + move2)
+
+		if indices > 2:
+		    moves3 = moves[2]
+		    moves03 = moves3['move']
+		    move3 = moves03['name']
+		    print('Move 3: ' + move3)
+
+		if indices > 3:
+		    moves4 = moves[3]
+		    moves04 = moves4['move']
+		    move4 = moves04['name']
+		    print('Move 4: ' + move4)
+		'''
+	
+	# TODO: Implement a method to retrieve all possible moves a Pokemon can learn
+	def get_all_moves(self):
+		return 'Not yet implemented.'
+
+	# Auxiliary Functions
+
+	# Returns information about the Pokemon
+	# Mainly used for testing purposes
 	def info_dump(self):
 		print('ID: ' + self.num)
 		print('Name: ' + self.name)

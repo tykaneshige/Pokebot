@@ -11,6 +11,7 @@ from discord.ext import commands
 
 Token = 'Insert Token Here'
 
+# TODO: Change spawn counter before release
 SPAWN_COUNTER = 1
 SPAWN_LIMIT = 3
 
@@ -52,7 +53,7 @@ class Pokebot(commands.Cog):
 
         # Check for a trainer name
         if name == '':
-            await ctx.send('Please pass a name. (Format: \' !poke start <trainer_name>\'')
+            await ctx.send('Please pass a name. Format: \'!poke start <trainer_name>\'')
             return
 
         # Check if the trainer exists 
@@ -71,21 +72,14 @@ class Pokebot(commands.Cog):
             await ctx.send("You are already a Trainer!")
             return
 
-    # Returns a list of all trainers in the server
-    @commands.command()
-    async def trainers(self,ctx):
-
-        # Compile a trainer list
-        trainer_list = ''
-        for trainer in self.trainers.values():
-            trainer_list += str(trainer.name)
-
-        # Send the trainer list to the server
-        await ctx.send(trainer_list)
-
     # Rename the trainer owned by the user who made the request
     @commands.command()
     async def rename(self,ctx,name=''):
+
+        # Verify that the user is a registered trainer
+        if ctx.author.id not in self.trainers:
+            await ctx.send('Please register as a trainer first. Use \'!poke start\'.')
+            return
         
         # Check for a trainer name
         if name == '':
@@ -102,15 +96,35 @@ class Pokebot(commands.Cog):
             
             # Change trainer name
             self.trainers[ctx.author.id].name = name
-
             await ctx.send('Successfully changed trainer name.')
-
         except:
             await ctx.send('Error renaming trainer.')
 
-    # TODO
+    # Returns a list of all trainers in the server
+    @commands.command()
+    async def trainers(self,ctx):
+
+        # Verify that the user is a registered trainer
+        if ctx.author.id not in self.trainers:
+            await ctx.send('Please register as a trainer first. Use \'!poke start\'.')
+            return
+
+        # Compile a trainer list
+        trainer_list = ''
+        for trainer in self.trainers.values():
+            trainer_list += str(trainer.name)
+
+        # Send the trainer list to the server
+        await ctx.send(trainer_list)
+
+    # Attempt to catch a Pokemon
     @commands.command()
     async def catch(self,ctx,name=''):
+
+        # Verify that the user is a registered trainer
+        if ctx.author.id not in self.trainers:
+            await ctx.send('Please register as a trainer first. Use \'!poke start\'.')
+            return
         
         # Check for a Pokemon name
         if name == '':
@@ -129,22 +143,50 @@ class Pokebot(commands.Cog):
             await ctx.send('Try again!')
             return
         
-        # Remove Pokemon sprite from image cache
         try:
+            # Remove Pokemon sprite from image cache
             r_file = self.generate_filename(caught_key)
             os.remove(r_file)
+
+            # Add Pokemon to trainer
+            self.trainers[ctx.author.id].catch_pokemon(self.pokemon[caught_key])
+
+            await ctx.send('Congratulations! You caught a level {} {}!'.format(self.pokemon[caught_key].level,self.pokemon[caught_key].name.capitalize()))
+
+            # Remove Pokemon from memory
+            del self.pokemon[caught_key]
         except:
             await ctx.send('Error catching Pokemon.')
             return
 
-        await ctx.send('Congratulations! You caught a {}!'.format(self.pokemon[caught_key].name.capitalize()))
-    
-        # Remove Pokemon from memory
-        del self.pokemon[caught_key]
+    # lists all Pokemon owned by the trainer who made the request
+    @commands.command()
+    async def list(self,ctx):
+
+        # Verify that the user is a registered trainer
+        if ctx.author.id not in self.trainers:
+            await ctx.send('Please register as a trainer first. Use \'!poke start\'.')
+            return
+        
+        # Send a list of captured Pokemon
+        full_list = self.trainers[ctx.author.id].list_pokemon()
+        await ctx.send(content=full_list)
 
     # Returns a list of Pokemon images available for capture
     @commands.command()
     async def available(self,ctx):
+
+        # Verify that the user is a registered trainer
+        if ctx.author.id not in self.trainers:
+            await ctx.send('Please register as a trainer first. Use \'!poke start\'.')
+            return
+
+        # Check for any number of available Pokemon
+        if not self.pokemon:
+            await ctx.send('There are no Pokemon available to catch :(')
+            return
+
+        # Send a list of spawned Pokemon
         for key in self.pokemon.keys():
             img_file = self.generate_filename(key)
             with open(img_file, 'rb') as fp:
@@ -153,12 +195,9 @@ class Pokebot(commands.Cog):
 
     # TODO: Remove before final version
     @commands.command()
-    async def test(self,ctx):
-        pass
-
-    # TODO: Remove before final version
-    @commands.command()
     async def exit(self,ctx):
+        self.clear_cache()
+
         await ctx.send('Shutting Down.')
         await self.bot.close()
 
@@ -166,9 +205,6 @@ class Pokebot(commands.Cog):
             print('Bot shut down successfully.')
         else:
             print('Bot did not terminate properly.')
-
-        # Clear image cache
-        self.clear_cache()
 
     # Bot Listeners
 
@@ -183,6 +219,8 @@ class Pokebot(commands.Cog):
 
         # Clear image cache
         self.clear_cache()
+
+        print('Ready.')
 
     @commands.Cog.listener()
     async def on_message(self,message):
@@ -254,7 +292,6 @@ class Pokebot(commands.Cog):
                     with open(new_filename, 'rb') as fp:
                         img = discord.File(fp)
                         await message.channel.send('Who\'s that Pokemon?', file=img)
-
                 except:
                     await message.channel.send('Error retrieving pokemon data.')
                     return
