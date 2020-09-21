@@ -1,7 +1,7 @@
 # Pokebot
 
 *Thomas Kaneshige (tykaneshige.work@gmail.com)* </br>
-*Ryan Tsukamoto* </br>
+*Ryan Tsukamoto (ryantsukamoto@yahoo.com)* </br>
 *Kiane Wang* </br>
 *Nicholas Yamamoto* </br>
 
